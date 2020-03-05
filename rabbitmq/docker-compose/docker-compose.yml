@@ -1,0 +1,34 @@
+version: "3"
+services:
+    rabbitmq-server:
+      image: rabbitmq:3-management
+      container_name: rabbitmq-server
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+      volumes:
+        - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+        - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+        - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+        - ./definitions.json:/etc/rabbitmq/definitions.json
+        - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      networks:
+        - rabbitmq-network
+    rabbitmq-consumer:
+      build: consumer
+      container_name: rabbitmq-consumer
+      depends_on:
+        - rabbitmq-server
+      networks:
+        - rabbitmq-network
+      tty: true
+    rabbitmq-producer:
+      build: producer
+      container_name: rabbitmq-producer
+      depends_on:
+        - rabbitmq-server 
+      networks:
+        - rabbitmq-network
+      tty: true
+networks:
+    rabbitmq-network: 

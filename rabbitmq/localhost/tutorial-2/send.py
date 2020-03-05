@@ -8,7 +8,7 @@ import sys
 # in this example, the localhost is acting as the producer, consumer, and broker.
 # If this app were a consumer or producer (or both) on a different machine than the broker, we'd attempt to connect to the IP of the broker node instead
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1'))
 channel = connection.channel()
 
 # create a new queue that manages tasks

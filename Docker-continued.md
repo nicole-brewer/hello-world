@@ -15,6 +15,19 @@ Let's say I wrote a program that work on my desktop by refering to `localhost` a
 
 
 
+## Clean up
+
+```bash
+# remove dangling images
+docker system prune
+# and also any stopped containers and unused images
+docker system prune -a
+
+docker volume prune
+```
+
+
+
 ## An alternative to `docker system prune`
 
 ```
@@ -34,6 +47,6 @@ docker rmi $(docker images -q)
 
 ##Save file from container to host
 
-```
+```pwd
 docker cp <containerId>:/file/path/within/container /host/path/target
 ```

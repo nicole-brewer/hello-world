@@ -12,6 +12,7 @@ container. `Dockerfile`'s have the following format options:
 ```Dockerfile
 # All Dockerfiles must specify a base image
 FROM <base image>
+MAINTAINER 
 
 # Note: subsequent references to defined environment
 # variables can be made by $<key> or ${<key>}

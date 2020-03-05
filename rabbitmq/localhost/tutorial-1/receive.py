@@ -4,7 +4,7 @@ import time
 
 # connect to the broker as before
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host='127.0.0.1'))
 channel = connection.channel()
 
 # we declare the queue again just like we did in the sender to make sure it exists

@@ -1,27 +1,36 @@
 ```bash
-# create new
-sudo kubeadm init
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown 1000:1000 $HOME/.kube/config
-export KUBECONFIG=$HOME/.kube/config
+sudo iptables -A INPUT -p tcp --dport 6443 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 
-# tear down old
+# tear down old on all nodes
 sudo kubeadm reset
+
+# tear down on master
+rm -r /etc/cni/net.d/
 rm $HOME/.kube/config
+
 # or create token for old (valid for 24 hours)
 kubeadm token create
 
-# configure networking for single node
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# initialize the control-plane node
+sudo kubeadm init
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown 1000:1000 $HOME/.kube/config
+# or if root...
+export KUBECONFIG=$HOME/.kube/config
+
 
 # Install Weave Net (pod network)
 sudo sysctl net.bridge.bridge-nf-call-iptables=1
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-# verify
+# verify coredns and weavenet pods have gone from pending to running
 kubectl get pods --all-namespaces
-# untaint nodes that have one
-kubectl taint nodes --all node-role.kubernetes.io/master-
+# untaint nodes to be able to schedule Pods on the control-plane node, for example for a single-machine Kubernetes cluster. Not recommended for production
+# kubectl taint nodes --all node-role.kubernetes.io/master-
+# should get
+# node/ip-172-31-16-63 untainted
 
 # run "kubeadm join" command given in kubeadm init
 
@@ -37,6 +46,15 @@ kubectl get pods -n kube-system -l name=weave-net -o wide
 
 kubectl create deployment idata-pipeline --image=<docker-image>
 kubectl get deployents
+```
+
+
+
+## Settings for Jetstream instance
+
+```bash
+systemctl enable docker.service
+# added line 'cgroupDriver: systemd' to /var/lib/kubelet/config.yaml 
 ```
 
 
@@ -148,7 +166,7 @@ metadata:
   uid: dc90aed0-c6a1-41a5-992a-5dfa338069d9
 ```
 
-```
+```bash
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown 1000:1000 $HOME/.kube/config
@@ -161,9 +179,7 @@ sudo docker run -i --entrypoint="/bin/bash" --name pipeline-container  -p 5671:5
 kubectl create deployment idata-pipeline --image=<docker-image>
 kubectl get deplyents
 
-```bash
 
-```
 
 Docker Pre-pulled Images on Kubernetes
 

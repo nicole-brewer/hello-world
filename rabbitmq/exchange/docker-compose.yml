@@ -1,0 +1,23 @@
+version: "3"
+services:
+    rabbitmq-server:
+      image: rabbitmq:3-management
+      container_name: rabbitmq-server
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+      volumes:
+        - ./definitions.json:/etc/rabbitmq/definitions.json
+        - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    rabbitmq-exchange:
+      build: exchange 
+      container_name: rabbitmq-exchange
+      depends_on:
+        - rabbitmq-server
+      tty: true
+    rabbitmq-producer:
+      build: producer
+      container_name: rabbitmq-producer
+      depends_on:
+        - rabbitmq-server 
+      tty: true
